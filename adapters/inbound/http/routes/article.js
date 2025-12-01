@@ -1,14 +1,8 @@
 import express from "express";
+import * as articleUseCases from "../../../../application/usecases/article.usecase.js";
 
-export function createArticleRouter(useCases) {
+export function createArticleRouter() {
   const router = express.Router();
-  const {
-    getArticlesUseCase,
-    getArticleByIdUseCase,
-    createArticleUseCase,
-    updateArticleUseCase,
-    deleteArticleUseCase,
-  } = useCases;
 
   router.get("/", async (req, res, next) => {
     try {
@@ -21,7 +15,7 @@ export function createArticleRouter(useCases) {
         orderBy: "desc",
       };
 
-      const articles = await getArticlesUseCase.execute(options);
+      const articles = await articleUseCases.getArticles(options);
       res.json(articles);
     } catch (error) {
       console.error(error);
@@ -32,7 +26,7 @@ export function createArticleRouter(useCases) {
   router.post("/", async (req, res, next) => {
     try {
       const { title, content } = req.body;
-      const article = await createArticleUseCase.execute(title, content);
+      const article = await articleUseCases.createArticle(title, content);
       res.status(201).json(article);
     } catch (error) {
       console.error(error);
@@ -43,7 +37,7 @@ export function createArticleRouter(useCases) {
   router.get("/:id", async (req, res, next) => {
     try {
       const { id } = req.params;
-      const article = await getArticleByIdUseCase.execute(id);
+      const article = await articleUseCases.getArticleById(id);
 
       if (!article) {
         return res.status(404).json({ error: "Article not found" });
@@ -60,7 +54,7 @@ export function createArticleRouter(useCases) {
     try {
       const { id } = req.params;
       const { title, content } = req.body;
-      const article = await updateArticleUseCase.execute(id, title, content);
+      const article = await articleUseCases.updateArticle(id, title, content);
       res.json(article);
     } catch (error) {
       console.error(error);
@@ -71,7 +65,7 @@ export function createArticleRouter(useCases) {
   router.delete("/:id", async (req, res, next) => {
     try {
       const { id } = req.params;
-      await deleteArticleUseCase.execute(id);
+      await articleUseCases.deleteArticle(id);
       res.status(204).send();
     } catch (error) {
       console.error(error);

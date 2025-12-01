@@ -1,10 +1,7 @@
-import { Article } from "../../domain/article/Article.js";
+import { Article } from "../../../domain/article/Article.js";
+import { prisma } from "./prisma/prisma.js";
 
-export class PrismaArticleRepository {
-  constructor(prismaClient) {
-    this.prisma = prismaClient;
-  }
-
+class PrismaArticleRepository {
   async findAll(options = {}) {
     const { keyword, orderBy = "desc", limit, offset } = options;
 
@@ -29,12 +26,12 @@ export class PrismaArticleRepository {
       findOptions.skip = offset;
     }
 
-    const entities = await this.prisma.article.findMany(findOptions);
+    const entities = await prisma.article.findMany(findOptions);
     return entities.map(this.toArticle);
   }
 
   async findById(id) {
-    const entity = await this.prisma.article.findUnique({
+    const entity = await prisma.article.findUnique({
       where: { id: BigInt(id) },
     });
 
@@ -46,7 +43,7 @@ export class PrismaArticleRepository {
   }
 
   async create(article) {
-    const entity = await this.prisma.article.create({
+    const entity = await prisma.article.create({
       data: {
         title: article.title,
         content: article.content,
@@ -57,7 +54,7 @@ export class PrismaArticleRepository {
   }
 
   async update(id, article) {
-    const entity = await this.prisma.article.update({
+    const entity = await prisma.article.update({
       where: { id: BigInt(id) },
       data: {
         title: article.title,
@@ -69,7 +66,7 @@ export class PrismaArticleRepository {
   }
 
   async delete(id) {
-    await this.prisma.article.delete({
+    await prisma.article.delete({
       where: { id: BigInt(id) },
     });
   }
@@ -85,3 +82,6 @@ export class PrismaArticleRepository {
     );
   }
 }
+const prismaArticleRepository = new PrismaArticleRepository();
+
+export default prismaArticleRepository;
